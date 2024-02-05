@@ -1,16 +1,17 @@
 import { BASE_URL } from "./constants";
 
 const defaultHeaders: HeadersInit = {
-  "Content-Type": "application/json",
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
 };
 
-interface FetchOptions<TBody = undefined> {
+interface FetchOptions<TBody = undefined | string> {
   method?: "GET" | "POST";
   body?: TBody;
   headers?: HeadersInit;
 }
 
-async function fetchAPI<TResponse, TBody = undefined>(
+async function fetchAPI<TResponse, TBody = undefined | string>(
   endpoint: string,
   options: FetchOptions<TBody> = {}
 ): Promise<TResponse> {
@@ -19,6 +20,7 @@ async function fetchAPI<TResponse, TBody = undefined>(
 
     const config: RequestInit = {
       method,
+      mode: "no-cors",
       headers: { ...defaultHeaders, ...headers },
       body: body ? JSON.stringify(body) : null,
     };
@@ -53,4 +55,32 @@ export async function getWinRate(
   return fetchAPI<WinRateResponse>(
     `arena/calc-win-rate?${queryParams.toString()}`
   );
+}
+
+export async function getArenaIndex(
+  limit: number,
+  offset: number
+): Promise<WinRateResponse> {
+  return fetchAPI<WinRateResponse>("graphql", {
+    method: "POST",
+    body: `{
+      battleArenaRanking(
+        championshipId: 0
+        round: 8
+        offset: ${offset}
+        limit: ${limit}
+      ) {
+        blockIndex
+        agentAddress
+        avatarAddress
+        name
+        cp
+        round
+        score
+        ticket
+        ranking
+        timeStamp
+      }
+    }`,
+  });
 }

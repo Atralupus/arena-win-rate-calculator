@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Avatar } from "../../types";
+import { getArenaIndex } from "../../apiClient";
 
 interface ArenaInfo {
   rank: number;
@@ -19,8 +20,13 @@ const ArenaPage = () => {
     setSearchAddress(e.target.value);
   };
 
+
   useEffect(() => {
     console.log(avatarAddress);
+
+    const response = getArenaIndex(1, 3);
+    console.log(response);
+
     setArenaInfos([
       {
         rank: 1,
